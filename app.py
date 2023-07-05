@@ -2,7 +2,6 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-
 import cv2
 import gradio as gr
 import sys
@@ -14,10 +13,24 @@ pipeline = Inferer("weights/yolo_license_plate.pt", "cpu", "data/mydataset.yaml"
 print(f"GPU on? {'🟢' if pipeline.device.type != 'cpu' else '🔴'}")
 
 def fn_image(image, conf_thres, iou_thres):
-    predict_yolo,bbox_cut = pipeline(image, conf_thres, iou_thres)
-    result = faster_RCNN(bbox_cut)
-    print(result)
-    return predict_yolo
+    result_1 = pipeline(image, conf_thres, iou_thres)
+    
+    if result_1 is None:
+        return
+    else :
+        predict_yolo, bbox_cut ,xyxy = result_1
+        result = faster_RCNN(bbox_cut)
+        cv2.putText(
+                img = predict_yolo,
+                text = result,
+                org = (int(xyxy[0].item()), int(xyxy[1].item())-2),
+                fontFace= 0,
+                fontScale = 1.5,
+                color = (0,0,255),
+                thickness= 3,
+                lineType=cv2.LINE_AA
+                )
+    return predict_yolo 
 
 
 def fn_video(video_file, conf_thres, iou_thres, start_sec, duration):
