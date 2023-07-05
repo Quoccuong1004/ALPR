@@ -57,13 +57,13 @@ class Inferer:
     def __call__(
         self,
         path_or_image,
-        conf_thres=0.25,
-        iou_thres=0.45,
+        conf_thres=0.5,
+        iou_thres=0.5,
         classes=None,
         agnostic_nms=False,
-        max_det=1000,
-        hide_labels=False,
-        hide_conf=False,
+        max_det=20,
+        hide_labels=True,
+        hide_conf=True,
     ):
         """Model Inference and results visualization"""
 
@@ -106,7 +106,7 @@ class Inferer:
                 bbox = self.extract_roi(img_ori,xyxy)
             img_src = np.asarray(img_ori)
 
-            return img_src, bbox
+            return img_src, bbox ,xyxy
 
     @staticmethod
     def precess_image(path_or_image, img_size, stride, half):
