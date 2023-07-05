@@ -5,14 +5,19 @@ from pathlib import Path
 
 import cv2
 import gradio as gr
-
+import sys
+sys.path.insert(0, "./faster_RCNN")
+from fasterRCNN import faster_RCNN
 from inferer import Inferer
 
 pipeline = Inferer("weights/yolo_license_plate.pt", "cpu", "data/mydataset.yaml", 640)
 print(f"GPU on? {'🟢' if pipeline.device.type != 'cpu' else '🔴'}")
 
 def fn_image(image, conf_thres, iou_thres):
-    return pipeline(image, conf_thres, iou_thres)
+    predict_yolo,bbox_cut = pipeline(image, conf_thres, iou_thres)
+    result = faster_RCNN(bbox_cut)
+    print(result)
+    return predict_yolo
 
 
 def fn_video(video_file, conf_thres, iou_thres, start_sec, duration):
@@ -68,7 +73,7 @@ image_interface = gr.Interface(
         gr.Slider(0, 1, value=0.5, label="Confidence Threshold"),
         gr.Slider(0, 1, value=0.5, label="IOU Threshold"),
     ],
-    outputs=gr.Image(type="file"),
+    outputs=gr.Image(type="filepath"),
  #   examples=[["example_1.jpg", 0.5, 0.5], ["example_2.jpg", 0.25, 0.45], ["example_3.jpg", 0.25, 0.45]],
     title="YOLOv6",
     description=(
@@ -93,7 +98,7 @@ video_interface = gr.Interface(
         gr.Slider(0, 10, value=0, label="Start Second", step=1),
         gr.Slider(0, 10 if pipeline.device.type != 'cpu' else 3, value=4, label="Duration", step=1),
     ],
-    outputs=gr.Video(type="file", format="mp4"),
+    outputs=gr.Video(type="filepath", format="mp4"),
     # examples=[
     #     ["example_1.mp4", 0.25, 0.45, 0, 2],
     #     ["example_2.mp4", 0.25, 0.45, 5, 3],
@@ -120,7 +125,7 @@ webcam_interface = gr.Interface(
         gr.Slider(0, 1, value=0.5, label="Confidence Threshold"),
         gr.Slider(0, 1, value=0.5, label="IOU Threshold"),
     ],
-    outputs=gr.Image(type="file"),
+    outputs=gr.Image(type="filepath"),
     live=True,
     title="YOLOv6",
     description=(
