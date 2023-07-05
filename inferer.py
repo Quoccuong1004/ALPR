@@ -102,10 +102,11 @@ class Inferer:
                     label,
                     color=self.generate_colors(class_num, True),
                 )
-
+                
+                bbox = self.extract_roi(img_ori,xyxy)
             img_src = np.asarray(img_ori)
 
-            return img_src
+            return img_src, bbox
 
     @staticmethod
     def precess_image(path_or_image, img_size, stride, half):
@@ -186,6 +187,12 @@ class Inferer:
                 thickness=tf,
                 lineType=cv2.LINE_AA,
             )
+    @staticmethod
+    def extract_roi(image, box):
+    # Extract the region of interest from the image based on the bounding box coordinates
+        p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+        roi = image[p1[1]:p2[1], p1[0]:p2[0]]
+        return roi
 
     @staticmethod
     def font_check(font="./yolov6/utils/Arial.ttf", size=10):
