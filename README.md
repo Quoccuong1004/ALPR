@@ -1,1 +1,1 @@
-#YOLOv6 Deploy
+YOLOv6 Deploy
