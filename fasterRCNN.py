@@ -35,7 +35,7 @@ def find_index(Box_sorted, box):
 
 detection_threshold = 0.65
 model = create_model(num_classes=NUM_CLASSES)
-checkpoint = torch.load('C:/Users/Admin/Desktop/Computer Vision/YOLOv6_Deploy/weights/faster_rcnn.pth', map_location=DEVICE)
+checkpoint = torch.load('./weights/faster_rcnn.pth', map_location=DEVICE)
 model.load_state_dict(checkpoint['model_state_dict'])
 model.to(DEVICE).eval()
 def faster_RCNN(image_path):
