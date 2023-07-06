@@ -17,20 +17,30 @@ def fn_image(image, conf_thres, iou_thres):
     
     if result_1 is None:
         return
-    else :
-        predict_yolo, bbox_cut ,xyxy = result_1
+    else:
+        predict_yolo, bbox_cut, xyxy = result_1
         result = faster_RCNN(bbox_cut)
-        cv2.putText(
-                img = predict_yolo,
-                text = result,
-                org = (int(xyxy[0].item()), int(xyxy[1].item())-2),
-                fontFace= 0,
-                fontScale = 1.5,
-                color = (0,0,255),
-                thickness= 3,
-                lineType=cv2.LINE_AA
-                )
-    return predict_yolo 
+        lw = max(round(sum(image.shape) / 2 * 0.003), 2)
+        # Get the coordinates of the text position
+        text_x, text_y = int(xyxy[0].item()), int(xyxy[1].item())
+
+        # Measure the width and height of the text
+        (text_width, text_height), _ = cv2.getTextSize(text=result, fontFace=0, fontScale=lw/2, thickness=3)
+
+        # Calculate the coordinates of the rectangle
+        rect_x = text_x
+        rect_y = text_y - text_height - 2
+        rect_x2 = text_x + text_width
+        rect_y2 = text_y
+
+        # Draw the white rectangle
+        cv2.rectangle(img=predict_yolo, pt1=(rect_x, rect_y), pt2=(rect_x2, rect_y2), color=(255, 255, 255), thickness=cv2.FILLED)
+
+        
+        # Draw the text on the rectangle
+        cv2.putText(img=predict_yolo, text=result, org=(text_x, text_y-2), fontFace=0, fontScale=lw/2,
+                    color=(0, 0, 255), thickness=3, lineType=cv2.LINE_AA)
+    return predict_yolo
 
 
 def fn_video(video_file, conf_thres, iou_thres, start_sec, duration):
@@ -158,4 +168,4 @@ if __name__ == "__main__":
     gr.TabbedInterface(
         [video_interface, image_interface, webcam_interface],
         ["Run on Videos!", "Run on Images!", "Run on Webcam!"],
-    ).launch()
+    ).launch(share = True)
