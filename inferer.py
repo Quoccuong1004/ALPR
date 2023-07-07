@@ -85,28 +85,32 @@ class Inferer:
         self.font_check()
 
         if len(det):
+            bbox_ = []
+            xyxy_ = []
             det[:, :4] = self.rescale(img.shape[2:], det[:, :4], img_src.shape).round()
 
             for *xyxy, conf, cls in reversed(det):
                 class_num = int(cls)  # integer class
                 label = (
-                    None
-                    if hide_labels
-                    else (self.class_names[class_num] if hide_conf else f"{self.class_names[class_num]} {conf:.2f}")
-                )
+                        None
+                        if hide_labels
+                        else (self.class_names[class_num] if hide_conf else f"{self.class_names[class_num]} {conf:.2f}")
+                    )
 
                 self.plot_box_and_label(
-                    img_ori,
-                    max(round(sum(img_ori.shape) / 2 * 0.003), 2),
-                    xyxy,
-                    label,
-                    color=self.generate_colors(class_num, True),
-                )
-                
+                        img_ori,
+                        max(round(sum(img_ori.shape) / 2 * 0.003), 2),
+                        xyxy,
+                        label,
+                        color=self.generate_colors(class_num, True),
+                    )
+                    
                 bbox = self.extract_roi(img_ori,xyxy)
+                bbox_.append(bbox)
+                xyxy_.append(xyxy)
             img_src = np.asarray(img_ori)
 
-            return img_src, bbox ,xyxy
+            return img_src, bbox_, xyxy_
 
     @staticmethod
     def precess_image(path_or_image, img_size, stride, half):
