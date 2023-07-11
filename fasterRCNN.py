@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "./fasterRCNN.py")
-
 import numpy as np
 import cv2
 import torch
@@ -10,13 +7,12 @@ import time
 import torchvision.transforms as transforms
 import functools
 from model import create_model
-
 from config import (
     NUM_CLASSES, DEVICE, CLASSES
 )
 
 def compare(rect1, rect2):
-        if abs(rect1[1] - rect2[1]) > 40:
+        if abs(rect1[1] - rect2[1]) > 35:
             return rect1[1] - rect2[1]
         else:
             return rect1[0] - rect2[0]
@@ -33,16 +29,18 @@ def find_index(Box_sorted, box):
                 index += 1
     return index_value
 
-detection_threshold = 0.65
-model = create_model(num_classes=NUM_CLASSES)
-checkpoint = torch.load('./weights/faster_rcnn.pth', map_location=DEVICE)
-model.load_state_dict(checkpoint['model_state_dict'])
-model.to(DEVICE).eval()
-def faster_RCNN(image_path):
+def faster_RCNN(image_path, detection_threshold=0.5, model = create_model):
     #image = cv2.imread(image_path)
     orig_image = image_path
+    w = orig_image.shape[0]
+    h = orig_image.shape[1]
 
-    image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB).astype(np.float32)
+    if w/h>1.5:
+        cropped_im = cv2.resize(orig_image,(470,110))
+    else :
+        cropped_im = cv2.resize(orig_image, (280,200))
+
+    image = cv2.cvtColor(cropped_im, cv2.COLOR_BGR2RGB).astype(np.float32)
     image /= 255.0
     image = np.transpose(image, (2, 0, 1)).astype(np.float32)
     image = torch.tensor(image, dtype=torch.float)
