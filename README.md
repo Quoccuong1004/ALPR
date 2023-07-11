@@ -28,6 +28,7 @@ pip install gradio (python3 pip install gradio for MacOS)
 >>><strong>Important - Download the weights of models</strong>
 - Open this <a href="https://drive.google.com/drive/folders/1mlu-t7ZW3XIF43dmByD7oZPmipYQ4uNY?fbclid=IwAR12tb-a4CetJj1IyzqLGMlxNR7tGC3qIwrVI_LTzUXV8VPHDzEsVKrsXeQ">Google Drive</a> to download
 - Download all the weights of models
+- Create a 'weights' folder in the ALPR project
 - Save them in ALPR/weights folder
 ```
 >>> Run project:
